@@ -1,0 +1,28 @@
+{"time": "2026-02-08T16:12:49.511031", "ip": "172.20.0.1", "path": "/predict", "payload": "{\n  \"payload\": \"<script>alert(1)</script>\"\n}", "attack": "xss", "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"}
+{"time": "2026-02-08T16:12:51.065119", "ip": "172.20.0.1", "path": "/predict", "payload": "{\n  \"payload\": \"<script>alert(1)</script>\"\n}", "attack": "xss", "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"}
+{"time": "2026-02-08T16:32:44.540159", "ip": "172.20.0.1", "path": "/predict", "payload": "{\"payload\":\"<script>alert(1)</script>\"}", "attack": "xss", "ua": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.7462"}
+{"time": "2026-02-09T09:55:20.446019", "ip": "172.20.0.4", "payload": "GET /?q=<script>alert(1)</script>", "attack": "xss"}
+{"time": "2026-02-09T09:56:12.464294", "ip": "172.20.0.4", "payload": "GET /?q=v3dm0s&xss=%3Cscript%3Ealert%28%22XSS%22%29%3C%2Fscript%3E", "attack": "xss"}
+{"time": "2026-02-10T03:53:46.105150", "ip": "172.20.0.4", "payload": "GET /?q=%3Cscript%3Ealert(1)%3C/script%3E", "attack": "xss"}
+{"time": "2026-02-10T04:00:23.131454", "ip": "172.20.0.4", "payload": "GET /?q=<script>alert(1)</script>", "attack": "xss"}
+{"time": "2026-02-10T06:03:11.483216", "ip": "172.20.0.4", "payload": "get /?q=union%20select%20null,null", "attack": "sqli"}
+{"time": "2026-02-10T06:03:16.170733", "ip": "172.20.0.4", "payload": "get /?q=union%20select%20null,null", "attack": "sqli"}
+{"time": "2026-02-11T01:41:19.261780", "ip": "172.20.0.4", "payload": "GET /?q=UNION%20SELECT%20NULL,NULL", "attack": "sqli_ml", "confidence": 0.9405631365687833}
+{"time": "2026-02-11T01:41:29.828870", "ip": "172.20.0.4", "payload": "GET /?q=UNION%20SELECT%20NULL,NULL", "attack": "sqli_ml", "confidence": 0.9405631365687833}
+{"time": "2026-02-11T01:41:46.327422", "ip": "172.20.0.4", "payload": "GET /?user=admin%27%20--%20", "attack": "sqli_blacklist"}
+{"time": "2026-02-14T05:31:26.066891", "ip": "172.20.0.4", "payload": "get /?q=<script>alert(1)</script>", "attack": "xss", "confidence": 0.89}
+{"time": "2026-02-14T05:31:38.190783", "ip": "172.20.0.4", "payload": "get /?q=<script>alert(1)</script>", "attack": "xss", "confidence": 0.89}
+{"time": "2026-02-14T05:32:14.569558", "ip": "172.20.0.4", "payload": "get /?q=union%20select%20null,null", "attack": "sqli", "confidence": 0.9405631365687833}
+{"time": "2026-02-14T05:59:12.229041", "ip": "172.20.0.4", "payload": "get /?q=<script>alert(1)</script>", "attack": "xss", "confidence": 0.89}
+{"time": "2026-02-14T05:59:21.247464", "ip": "172.20.0.4", "payload": "get /?q=%3cscript%3ealert(1)%3c/script%3e", "attack": "xss", "confidence": 0.85}
+{"time": "2026-02-14T05:59:50.468177", "ip": "172.20.0.4", "payload": "get /?q=%3cimg%20src=x%20onerror=alert(1)%3e", "attack": "xss", "confidence": 0.9}
+{"time": "2026-02-14T06:00:23.059002", "ip": "172.20.0.4", "payload": "get /?q=union%20select%20null,null", "attack": "sqli", "confidence": 0.9405631365687833}
+{"time": "2026-02-14T07:10:23.014942", "ip": "172.20.0.4", "payload": "get /?q=<script>alert(1)</script>", "attack": "xss", "confidence": 0.89}
+{"time": "2026-02-14T07:10:23.085037", "ip": "172.20.0.4", "payload": "get /?q=cscriptealert(1)c/scripte", "attack": "xss", "confidence": 0.85}
+{"time": "2026-02-14T07:10:23.154211", "ip": "172.20.0.4", "payload": "get /?q=cimg0src=x0onerror=alert(1)e", "attack": "xss", "confidence": 0.91}
+{"time": "2026-02-14T07:17:03.249640", "ip": "172.20.0.4", "payload": "get /?q=<script>alert(1)</script>", "attack": "xss", "confidence": 0.89}
+{"time": "2026-02-14T07:17:03.321755", "ip": "172.20.0.4", "payload": "get /?q=cscriptealert(1)c/scripte", "attack": "xss", "confidence": 0.85}
+{"time": "2026-02-14T07:17:03.390368", "ip": "172.20.0.4", "payload": "get /?q=cimg0src=x0onerror=alert(1)e", "attack": "xss", "confidence": 0.91}
+{"time": "2026-02-14T07:19:11.417377", "ip": "172.20.0.4", "payload": "get /?q=<script>alert(1)</script>", "attack": "xss", "confidence": 0.89}
+{"time": "2026-02-14T07:19:13.273689", "ip": "172.20.0.4", "payload": "get /?q=cscriptealert(1)c/scripte", "attack": "xss", "confidence": 0.85}
+{"time": "2026-02-14T07:19:15.240602", "ip": "172.20.0.4", "payload": "get /?id=170or01=10--", "attack": "sqli_blacklist"}
