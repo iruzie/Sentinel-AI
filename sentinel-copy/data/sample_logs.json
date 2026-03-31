@@ -1,0 +1,72 @@
+[
+  {
+    "ip": "192.168.1.6",
+    "attack": "SQLi",
+    "confidence": 0.92,
+    "status": 403,
+    "time": "2026-02-07 10:22:01"
+  },
+  {
+    "ip": "192.168.1.8",
+    "attack": "XSS",
+    "confidence": 0.87,
+    "status": 403,
+    "time": "2026-02-07 10:23:11"
+  },
+  {
+    "ip": "192.168.1.10",
+    "attack": "BOT",
+    "confidence": 0.76,
+    "status": 403,
+    "time": "2026-02-07 10:25:41"
+  },
+  {
+    "ip": "192.168.1.15",
+    "attack": "NORMAL",
+    "confidence": 0.12,
+    "status": 200,
+    "time": "2026-02-07 10:30:10"
+  },
+  {
+    "ip": "192.168.1.6",
+    "attack": "SQLi",
+    "confidence": 0.92,
+    "status": 403,
+    "time": "10:01"
+  },
+  {
+    "ip": "192.168.1.7",
+    "attack": "XSS",
+    "confidence": 0.88,
+    "status": 403,
+    "time": "10:02"
+  },
+  {
+    "ip": "192.168.1.8",
+    "attack": "BOT",
+    "confidence": 0.7,
+    "status": 403,
+    "time": "10:03"
+  },
+  {
+    "ip": "192.168.1.6",
+    "attack": "SQLi",
+    "confidence": 0.91,
+    "status": 403,
+    "time": "10:04"
+  },
+  {
+    "ip": "192.168.1.9",
+    "attack": "NORMAL",
+    "confidence": 0.12,
+    "status": 200,
+    "time": "10:05"
+  },
+  {
+    "ip": "192.168.1.10",
+    "attack": "FLOOD",
+    "confidence": 0.6,
+    "status": 429,
+    "time": "10:06"
+  }
+]

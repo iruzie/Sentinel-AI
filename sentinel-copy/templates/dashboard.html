@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentinel-AI Security Dashboard</title>
+  <meta name="description"
+    content="Sentinel-AI — Real-time web application firewall and security analytics dashboard." />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <div class="app-shell">
+
+    <!-- =====================================================
+       LEFT SIDEBAR
+  ====================================================== -->
+    <aside class="sidebar">
+
+      <!-- Logo -->
+      <div class="sidebar-logo">
+        <div class="logo-icon">🛡</div>
+        <div>
+          <div class="logo-text">Sentinel-AI</div>
+          <div class="logo-sub">Security Platform</div>
+        </div>
+      </div>
+
+      <!-- Main nav -->
+      <span class="sidebar-section-label">Main</span>
+      <ul class="nav-list">
+        <li class="nav-item active" id="nav-dashboard" onclick="navigateTo('dashboard')">
+          <span class="nav-icon">📊</span> Dashboard
+        </li>
+        <li class="nav-item" id="nav-logs" onclick="navigateTo('logs')">
+          <span class="nav-icon">📋</span> Live Logs
+        </li>
+        <li class="nav-item" id="nav-threats" onclick="navigateTo('threats')">
+          <span class="nav-icon">⚠️</span> Threat Analysis
+        </li>
+      </ul>
+
+      <!-- Security nav -->
+      <span class="sidebar-section-label">Security</span>
+      <ul class="nav-list">
+        <li class="nav-item" id="nav-blacklist" onclick="navigateTo('blacklist')">
+          <span class="nav-icon">🚫</span> IP Blacklist
+        </li>
+        <li class="nav-item" id="nav-export" onclick="navigateTo('export')">
+          <span class="nav-icon">📂</span> Log Export
+        </li>
+        <li class="nav-item" id="nav-ml" onclick="navigateTo('ml')">
+          <span class="nav-icon">🤖</span> ML Engine
+        </li>
+        <li class="nav-item" id="nav-phishing" onclick="navigateTo('phishing')">
+          <span class="nav-icon">🎣</span> Phishing Detector
+        </li>
+      </ul>
+
+      <!-- System nav -->
+      <span class="sidebar-section-label">System</span>
+      <ul class="nav-list">
+        <li class="nav-item" id="nav-about" onclick="navigateTo('about')">
+          <span class="nav-icon">ℹ️</span> About
+        </li>
+      </ul>
+
+      <!-- Footer status -->
+      <div class="sidebar-footer">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          System Online
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- =====================================================
+       RIGHT MAIN AREA
+  ====================================================== -->
+    <div class="main">
+
+      <!-- Top bar -->
+      <div class="topbar">
+        <div>
+          <div class="topbar-title" id="topbar-title">Dashboard</div>
+          <div class="topbar-subtitle" id="topbar-subtitle">Real-time security overview</div>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-chip">🔄 Auto-refresh: 5s</div>
+          <div class="topbar-chip" id="topbar-time"></div>
+        </div>
+      </div>
+
+      <!-- Scrollable content area -->
+      <div class="page-content">
+
+        <!-- ==================================================
+           PAGE: Dashboard
+      =================================================== -->
+        <div class="page-panel active" id="panel-dashboard">
+
+          <!-- Stat tiles -->
+          <div class="stat-grid">
+            <div class="stat-tile">
+              <div class="tile-label">Security Score</div>
+              <div class="tile-value" id="score">—</div>
+              <div class="tile-sub" style="color:var(--success)">Overall safety rating</div>
+            </div>
+            <div class="stat-tile">
+              <div class="tile-label">Total Requests</div>
+              <div class="tile-value" id="stat-total">—</div>
+              <div class="tile-sub" style="color:var(--text-muted)">Across all time</div>
+            </div>
+            <div class="stat-tile">
+              <div class="tile-label">Blocked</div>
+              <div class="tile-value" id="stat-blocked" style="color:var(--danger)">—</div>
+              <div class="tile-sub" style="color:var(--danger)">HTTP 403 responses</div>
+            </div>
+            <div class="stat-tile">
+              <div class="tile-label">Allowed</div>
+              <div class="tile-value" id="stat-allowed" style="color:var(--success)">—</div>
+              <div class="tile-sub" style="color:var(--success)">HTTP 200 responses</div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">Attack Type Distribution</div>
+              <div class="card-sub">Breakdown of detected threat categories</div>
+              <canvas id="pie" height="220"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title">CDN Response Actions</div>
+              <div class="card-sub">How traffic was handled by Sentinel-AI</div>
+              <canvas id="bar" height="220"></canvas>
+            </div>
+          </div>
+
+          <!-- Top IPs -->
+          <div class="card">
+            <div class="card-title">🔥 Top Malicious IPs</div>
+            <div class="card-sub">Most frequent offenders</div>
+            <table id="ips"></table>
+          </div>
+
+        </div><!-- /panel-dashboard -->
+
+
+        <!-- ==================================================
+           PAGE: Live Logs
+      =================================================== -->
+        <div class="page-panel" id="panel-logs">
+
+          <div class="card">
+            <div class="card-title">📋 Live Request Logs</div>
+            <div class="card-sub">Real-time feed of all inspected traffic — updates every 5 seconds</div>
+            <div class="form-group" style="margin-bottom:14px;">
+              <input id="search" type="text" placeholder="🔍  Search by IP or attack type…" />
+            </div>
+            <table id="logs"></table>
+          </div>
+
+        </div><!-- /panel-logs -->
+
+
+        <!-- ==================================================
+           PAGE: Threat Analysis
+      =================================================== -->
+        <div class="page-panel" id="panel-threats">
+
+          <div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr;">
+            <div class="stat-tile">
+              <div class="tile-label">XSS Attacks</div>
+              <div class="tile-value" id="threat-xss" style="color:var(--warning)">—</div>
+              <div class="tile-sub" style="color:var(--text-muted)">Cross-site scripting</div>
+            </div>
+            <div class="stat-tile">
+              <div class="tile-label">SQL Injections</div>
+              <div class="tile-value" id="threat-sqli" style="color:var(--danger)">—</div>
+              <div class="tile-sub" style="color:var(--text-muted)">Database attacks</div>
+            </div>
+            <div class="stat-tile">
+              <div class="tile-label">Bot Detections</div>
+              <div class="tile-value" id="threat-bot" style="color:var(--accent-2)">—</div>
+              <div class="tile-sub" style="color:var(--text-muted)">Automated scanners</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">⚠️ Threat Breakdown Table</div>
+            <div class="card-sub">All detected attack categories with event counts</div>
+            <table id="threat-table"></table>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Threat Trend</div>
+            <div class="card-sub">Attack type distribution visualised</div>
+            <canvas id="threat-bar" height="160"></canvas>
+          </div>
+
+        </div><!-- /panel-threats -->
+
+
+        <!-- ==================================================
+           PAGE: IP Blacklist
+      =================================================== -->
+        <div class="page-panel" id="panel-blacklist">
+
+          <div class="card">
+            <div class="card-title">🚫 IP Blacklist Manager</div>
+            <div class="card-sub">Permanently block malicious IP addresses — takes effect immediately</div>
+            <table id="blacklist"></table>
+          </div>
+
+        </div><!-- /panel-blacklist -->
+
+
+        <!-- ==================================================
+           PAGE: Log Export
+      =================================================== -->
+        <div class="page-panel" id="panel-export">
+
+          <div class="card">
+            <div class="card-title">📂 Log Management &amp; Export</div>
+            <div class="card-sub">Download security logs filtered by attack category</div>
+
+            <div class="filter-bar">
+              <div class="form-group">
+                <label class="form-label">Attack Type Filter</label>
+                <select id="type">
+                  <option value="ALL">ALL</option>
+                </select>
+              </div>
+              <div class="btn-group" style="margin-bottom:0;padding-bottom:0;">
+                <button class="btn btn-success" onclick="downloadCSV()">⬇ Download CSV</button>
+                <button class="btn btn-danger" onclick="downloadPDF()">⬇ Download PDF</button>
+              </div>
+            </div>
+            <p class="hint">Select an attack type above, then click a download button to export filtered logs.</p>
+
+            <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+              <div class="card-title" style="font-size:13px;color:var(--danger);">⚠️ Danger Zone</div>
+              <div class="card-sub" style="margin-bottom:10px;">Permanently erase ALL log data — both ML quarantine
+                events and NGINX bot-detection records. Bot detection count will reset to zero.</div>
+              <button class="btn btn-danger" id="clear-logs-btn" onclick="clearAllLogs()">🗑 Clear All Logs (Reset
+                Counters)</button>
+              <span id="clear-logs-msg" style="margin-left:12px;font-size:12px;"></span>
+            </div>
+          </div>
+
+        </div><!-- /panel-export -->
+
+
+        <!-- ==================================================
+           PAGE: Phishing Detector
+      =================================================== -->
+        <div class="page-panel" id="panel-phishing">
+
+          <!-- Hero description -->
+          <div class="about-hero" style="margin-bottom:18px;">
+            <div class="about-hero-icon" style="font-size:28px;">🎣</div>
+            <div class="about-hero-text">
+              <h2 style="font-size:18px;">Phishing URL Detector</h2>
+              <p style="font-size:13px;margin-top:4px;">
+                Paste any URL below and the on-device ML model will extract 25 structural
+                features and classify it as <strong style="color:var(--success)">Legitimate</strong>
+                or <strong style="color:var(--danger)">Phishing</strong> — no external network calls.
+                The GradientBoosting classifier was trained on 2,400 curated URL samples covering
+                IP-based URLs, brand impersonation, risky TLDs, URL-shorteners, encoded payloads and more.
+              </p>
+            </div>
+          </div>
+
+          <!-- Single URL Checker -->
+          <div class="card">
+            <div class="card-title">🔍 Single URL Analysis</div>
+            <div class="card-sub">Check one URL in depth — includes confidence score and full feature breakdown</div>
+
+            <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:0;">
+              <div class="form-group" style="flex:1;margin-bottom:0;">
+                <label class="form-label">URL to analyse</label>
+                <input id="phishing-url-input" type="text" placeholder="https://example.com/path?query=value"
+                  onkeydown="if(event.key==='Enter') checkPhishing()" />
+              </div>
+              <button class="btn btn-primary" id="phishing-check-btn" onclick="checkPhishing()"
+                style="padding:10px 22px;white-space:nowrap;">
+                ▶ Analyse
+              </button>
+            </div>
+
+            <!-- Result area -->
+            <div id="phishing-result" style="margin-top:18px;"></div>
+          </div>
+
+          <!-- Batch Checker -->
+          <div class="card">
+            <div class="card-title">📋 Batch URL Scanner</div>
+            <div class="card-sub">Check up to 20 URLs at once — one per line</div>
+            <div class="form-group">
+              <label class="form-label">URLs (one per line)</label>
+              <textarea id="phishing-batch-input" rows="5"
+                placeholder="https://google.com&#10;http://paypal-login.tk/verify&#10;https://github.com"
+                style="resize:vertical;"></textarea>
+            </div>
+            <button class="btn btn-primary" id="phishing-batch-btn" onclick="batchPhishing()">
+              ▶ Scan All
+            </button>
+            <div id="phishing-batch-result" style="margin-top:16px;"></div>
+          </div>
+
+          <!-- Scan History -->
+          <div class="card">
+            <div class="card-title">🕘 Scan History</div>
+            <div class="card-sub">URLs checked this session (most recent first)</div>
+            <button class="btn btn-ghost" style="margin-bottom:12px;font-size:11px;padding:5px 12px;"
+              onclick="clearHistory()">🗑 Clear</button>
+            <table id="phishing-history"></table>
+          </div>
+
+        </div><!-- /panel-phishing -->
+
+
+        <!-- ==================================================
+           PAGE: ML Engine
+      =================================================== -->
+        <div class="page-panel" id="panel-ml">
+
+          <div class="card">
+            <div class="card-title">🤖 ML Detection Engine</div>
+            <div class="card-sub">Active machine learning models powering Sentinel-AI</div>
+
+            <div class="model-row">
+              <div>
+                <div class="model-name">Global Anomaly Detector</div>
+                <div class="model-desc">Catches wide-spectrum attack payloads. Threshold: &gt;55% confidence</div>
+              </div>
+              <span class="badge badge-green">Active</span>
+            </div>
+            <div class="model-row">
+              <div>
+                <div class="model-name">XSS Classifier</div>
+                <div class="model-desc">Cross-site scripting pattern recognition. Threshold: &gt;70% confidence</div>
+              </div>
+              <span class="badge badge-green">Active</span>
+            </div>
+            <div class="model-row">
+              <div>
+                <div class="model-name">SQLi Classifier</div>
+                <div class="model-desc">SQL injection detection via TF-IDF vectors. Threshold: &gt;70% confidence</div>
+              </div>
+              <span class="badge badge-green">Active</span>
+            </div>
+            <div class="model-row">
+              <div>
+                <div class="model-name">SQLi Blacklist Engine</div>
+                <div class="model-desc">Regex-based blacklist for known SQLi patterns (always-on, zero-threshold)</div>
+              </div>
+              <span class="badge badge-blue">Rule-based</span>
+            </div>
+            <div class="model-row">
+              <div>
+                <div class="model-name">Bot Detection (NGINX)</div>
+                <div class="model-desc">User-agent fingerprinting for curl, wget, sqlmap, nikto, nmap, etc.</div>
+              </div>
+              <span class="badge badge-blue">Rule-based</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">📡 ML Inference Endpoint</div>
+            <div class="card-sub">Test a raw payload against all active ML models</div>
+            <div class="form-group">
+              <label class="form-label">Payload</label>
+              <input id="ml-payload" type="text" placeholder="e.g. ' OR 1=1 --" />
+            </div>
+            <button class="btn btn-primary" id="ml-test-btn" onclick="testPayload()">▶ Run Inference</button>
+            <div id="ml-result" style="margin-top:14px;"></div>
+          </div>
+
+        </div><!-- /panel-ml -->
+
+
+        <!-- ==================================================
+           PAGE: About
+      =================================================== -->
+        <div class="page-panel" id="panel-about">
+
+          <!-- Hero Banner -->
+          <div class="about-hero">
+            <div class="about-hero-icon">🛡</div>
+            <div class="about-hero-text">
+              <h2>Sentinel-AI — Intelligent Web Application Firewall</h2>
+              <p>
+                Sentinel-AI is a real-time, ML-powered Web Application Firewall (WAF) built on a
+                three-tier architecture: an NGINX edge proxy, a scikit-learn inference microservice,
+                and a FastAPI analytics dashboard. It intercepts every HTTP request before it reaches
+                your origin server, classifies payloads using trained ML models and regex blacklists,
+                and logs every decision for forensic review.
+              </p>
+              <div class="about-hero-badges">
+                <span class="badge badge-green">✓ Active Protection</span>
+                <span class="badge badge-blue">ML-Powered</span>
+                <span class="badge badge-purple">Containerised</span>
+                <span class="badge badge-yellow">Real-time Analytics</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Facts -->
+          <div class="card">
+            <div class="about-section-title">📋 Quick Facts</div>
+            <div class="info-grid-3">
+              <div class="info-tile">
+                <div class="info-item-label">Platform</div>
+                <div class="info-item-value">Sentinel-AI</div>
+              </div>
+              <div class="info-tile">
+                <div class="info-item-label">Version</div>
+                <div class="info-item-value">1.0.0</div>
+              </div>
+              <div class="info-tile">
+                <div class="info-item-label">Python Runtime</div>
+                <div class="info-item-value">3.11 (Docker) / 3.13 (local)</div>
+              </div>
+              <div class="info-tile">
+                <div class="info-item-label">Dashboard Framework</div>
+                <div class="info-item-value">FastAPI + Jinja2</div>
+              </div>
+              <div class="info-tile">
+                <div class="info-item-label">ML Inference Framework</div>
+                <div class="info-item-value">FastAPI + scikit-learn</div>
+              </div>
+              <div class="info-tile">
+                <div class="info-item-label">Deployment</div>
+                <div class="info-item-value">Docker Compose v3.9</div>
+              </div>
+              <div class="info-tile">
+                <div class="info-item-label">Edge / Proxy</div>
+                <div class="info-item-value">NGINX (alpine + latest)</div>
+              </div>
+              <div class="info-tile">
+                <div class="info-item-label">Log Format</div>
+                <div class="info-item-value">JSONL (events.jsonl)</div>
+              </div>
+              <div class="info-tile">
+                <div class="info-item-label">Export Formats</div>
+                <div class="info-item-value">CSV &amp; PDF (ReportLab)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tech Stack -->
+          <div class="card">
+            <div class="about-section-title">🧰 Technology Stack</div>
+            <div class="tech-stack">
+              <div class="tech-pill"><span class="pill-icon">🐍</span> Python 3.11 / 3.13</div>
+              <div class="tech-pill"><span class="pill-icon">⚡</span> FastAPI</div>
+              <div class="tech-pill"><span class="pill-icon">🧠</span> scikit-learn</div>
+              <div class="tech-pill"><span class="pill-icon">💾</span> joblib</div>
+              <div class="tech-pill"><span class="pill-icon">🌐</span> NGINX</div>
+              <div class="tech-pill"><span class="pill-icon">🐳</span> Docker Compose</div>
+              <div class="tech-pill"><span class="pill-icon">📄</span> ReportLab (PDF)</div>
+              <div class="tech-pill"><span class="pill-icon">📐</span> Jinja2 Templates</div>
+              <div class="tech-pill"><span class="pill-icon">📊</span> Chart.js</div>
+              
+              <div class="tech-pill"><span class="pill-icon">🔁</span> Uvicorn (ASGI)</div>
+            </div>
+          </div>
+
+          <!-- Traffic Pipeline -->
+          <div class="card">
+            <div class="about-section-title">🔄 Request Processing Pipeline</div>
+            <div class="pipeline">
+              <div class="pipeline-step">
+                <div class="pipeline-icon">🌍</div>
+                <div class="pipeline-label">Client Request</div>
+                <div class="pipeline-desc">HTTP request arrives at port 8080</div>
+              </div>
+              <div class="pipeline-step">
+                <div class="pipeline-icon">🤖</div>
+                <div class="pipeline-label">Bot Filter</div>
+                <div class="pipeline-desc">NGINX user-agent map blocks curl, sqlmap, nikto, etc.</div>
+              </div>
+              <div class="pipeline-step">
+                <div class="pipeline-icon">⏱</div>
+                <div class="pipeline-label">Rate Limiter</div>
+                <div class="pipeline-desc">2 req/s per IP, burst of 3 → HTTP 429</div>
+              </div>
+              <div class="pipeline-step">
+                <div class="pipeline-icon">🧠</div>
+                <div class="pipeline-label">ML Inspection</div>
+                <div class="pipeline-desc">auth_request → POST /predict on ML engine</div>
+              </div>
+              <div class="pipeline-step">
+                <div class="pipeline-icon">📦</div>
+                <div class="pipeline-label">Cache &amp; Proxy</div>
+                <div class="pipeline-desc">Proxy cache (60 s TTL) → forward to origin</div>
+              </div>
+              <div class="pipeline-step">
+                <div class="pipeline-icon">✅</div>
+                <div class="pipeline-label">Origin Served</div>
+                <div class="pipeline-desc">Clean traffic reaches the NGINX origin server</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Docker Services -->
+          <div class="card">
+            <div class="about-section-title">🐳 Docker Services (docker-compose.yml)</div>
+            <table>
+              <tr>
+                <th>Service</th>
+                <th>Image</th>
+                <th>Port</th>
+                <th>Role</th>
+              </tr>
+              <tr>
+                <td><span class="badge badge-blue">origin</span></td>
+                <td style="font-family:monospace;font-size:12px;">nginx:alpine</td>
+                <td>—</td>
+                <td style="color:var(--text-secondary)">Serves the protected web content (internal only)</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-purple">edge</span></td>
+                <td style="font-family:monospace;font-size:12px;">nginx:latest</td>
+                <td><span class="badge badge-green">8080</span></td>
+                <td style="color:var(--text-secondary)">Public entry point — WAF inspection, caching, rate-limiting</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-yellow">ml</span></td>
+                <td style="font-family:monospace;font-size:12px;">python:3.11-slim (built)</td>
+                <td><span class="badge badge-green">5000</span></td>
+                <td style="color:var(--text-secondary)">ML inference API — XSS, SQLi, Global anomaly classifiers</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- ML Models Detail -->
+          <div class="card">
+            <div class="about-section-title">🤖 ML Models — Technical Details</div>
+            <div class="model-cards">
+              <div class="model-card">
+                <div class="model-card-header">
+                  <div>
+                    <div class="model-card-name">Global Anomaly Detector</div>
+                    <div class="model-card-type">Classifier · global_model.joblib</div>
+                  </div>
+                  <span class="badge badge-green">Active</span>
+                </div>
+                <div class="model-card-desc">Wide-spectrum anomaly detection trained on diverse attack payloads.
+                  Vetorised with <code style="color:var(--accent);font-size:11px;">global_vectorizer.joblib</code>.
+                  Fires first in the pipeline before specialised models.</div>
+                <div class="model-card-stat">
+                  Threshold <span>&gt; 55% confidence</span>
+                </div>
+              </div>
+              <div class="model-card">
+                <div class="model-card-header">
+                  <div>
+                    <div class="model-card-name">XSS Classifier</div>
+                    <div class="model-card-type">Classifier · xss_model.joblib (2 MB)</div>
+                  </div>
+                  <span class="badge badge-green">Active</span>
+                </div>
+                <div class="model-card-desc">Catches script injection, event-handler attacks, and encoded XSS variants.
+                  Vectoriser: <code style="color:var(--accent);font-size:11px;">xss_vectorizer.joblib</code> (3.7 MB).
+                  Supports <code style="color:var(--accent);font-size:11px;">predict_proba</code>.</div>
+                <div class="model-card-stat">
+                  Threshold <span>&gt; 70% confidence</span>
+                </div>
+              </div>
+              <div class="model-card">
+                <div class="model-card-header">
+                  <div>
+                    <div class="model-card-name">SQLi Classifier</div>
+                    <div class="model-card-type">Classifier · sqli_model.joblib</div>
+                  </div>
+                  <span class="badge badge-green">Active</span>
+                </div>
+                <div class="model-card-desc">Identifies SQL injection patterns including UNION-based, OR-based, comment
+                  injection, SLEEP/BENCHMARK time attacks. TF-IDF vectorised.</div>
+                <div class="model-card-stat">
+                  Threshold <span>&gt; 70% confidence</span>
+                </div>
+              </div>
+              <div class="model-card">
+                <div class="model-card-header">
+                  <div>
+                    <div class="model-card-name">SQLi Regex Blacklist</div>
+                    <div class="model-card-type">Rule-based · 12 patterns</div>
+                  </div>
+                  <span class="badge badge-blue">Rule-based</span>
+                </div>
+                <div class="model-card-desc">Zero-latency first pass using 12 hardcoded regex patterns: UNION SELECT, OR
+                  1=1, DROP TABLE, --comment tricks, information_schema, SLEEP(), BENCHMARK().</div>
+                <div class="model-card-stat">
+                  Threshold <span>Any match → block</span>
+                </div>
+              </div>
+              <div class="model-card">
+                <div class="model-card-header">
+                  <div>
+                    <div class="model-card-name">Bot Detection</div>
+                    <div class="model-card-type">NGINX map · user-agent</div>
+                  </div>
+                  <span class="badge badge-blue">Rule-based</span>
+                </div>
+                <div class="model-card-desc">NGINX <code style="color:var(--accent);font-size:11px;">map</code>
+                  directive matches User-Agent against: curl, wget, sqlmap, nikto, nmap, python, httpie. Returns 403
+                  before the request reaches ML.</div>
+                <div class="model-card-stat">
+                  Threshold <span>7 tool signatures</span>
+                </div>
+              </div>
+              <div class="model-card">
+                <div class="model-card-header">
+                  <div>
+                    <div class="model-card-name">Proxy Cache</div>
+                    <div class="model-card-type">NGINX · sentinel_cache zone</div>
+                  </div>
+                  <span class="badge badge-yellow">Passive</span>
+                </div>
+                <div class="model-card-desc">10 MB key zone, 100 MB disk cache. 60-second TTL for 200 responses. Uses
+                  stale cache on error/timeout to maintain uptime during ML engine restarts.</div>
+                <div class="model-card-stat">
+                  Cache TTL <span>60 seconds</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NGINX Security Headers -->
+          <div class="card">
+            <div class="about-section-title">🔐 HTTP Security Headers (NGINX)</div>
+            <div class="sec-headers">
+              <div class="sec-header-row">
+                <div class="sec-header-name">X-Frame-Options</div>
+                <div class="sec-header-val"><code style="color:var(--warning)">DENY</code> — Prevents the page from
+                  being embedded in iframes. Mitigates clickjacking attacks.</div>
+              </div>
+              <div class="sec-header-row">
+                <div class="sec-header-name">X-XSS-Protection</div>
+                <div class="sec-header-val"><code style="color:var(--warning)">1; mode=block</code> — Enables the
+                  browser's built-in XSS filter and blocks rendering if an attack is detected.</div>
+              </div>
+              <div class="sec-header-row">
+                <div class="sec-header-name">X-Content-Type-Options</div>
+                <div class="sec-header-val"><code style="color:var(--warning)">nosniff</code> — Stops browsers from
+                  MIME-type sniffing, preventing content injection via malformed file types.</div>
+              </div>
+              <div class="sec-header-row">
+                <div class="sec-header-name">Referrer-Policy</div>
+                <div class="sec-header-val"><code style="color:var(--warning)">strict-origin-when-cross-origin</code> —
+                  Limits referrer information shared cross-origin to only the origin URL.</div>
+              </div>
+              <div class="sec-header-row">
+                <div class="sec-header-name">Content-Security-Policy</div>
+                <div class="sec-header-val"><code style="color:var(--warning)">default-src 'self'</code> — Restricts all
+                  resource loading to the same origin, blocking inline scripts and external assets.</div>
+              </div>
+              <div class="sec-header-row">
+                <div class="sec-header-name">X-Cache</div>
+                <div class="sec-header-val"><code style="color:var(--warning)">$upstream_cache_status</code> — Exposes
+                  cache hit/miss status (HIT, MISS, BYPASS) for debugging proxy cache performance.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NGINX Rate Limiting & Config -->
+          <div class="card">
+            <div class="about-section-title">⚙️ NGINX Configuration Highlights</div>
+            <div class="code-block">worker_processes auto; # Auto-scale to CPU cores
+
+              # Rate limiting: 2 req/s per IP, burst of 3 (nodelay = instant reject)
+              limit_req_zone $binary_remote_addr zone=cdn_limit:10m rate=2r/s;
+              limit_req_status 429;
+
+              # Proxy cache: 10 MB keys zone, 100 MB max disk, 60 s inactive TTL
+              proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=sentinel_cache:10m
+              max_size=100m inactive=60s use_temp_path=off;
+
+              # Bot detection via User-Agent map (blocks before ML engine is called)
+              map $http_user_agent $is_bot {
+              ~*curl | ~*wget | ~*sqlmap | ~*nikto | ~*nmap | ~*python | ~*httpie → 1;
+              }
+
+              # ML auth sub-request (internal – every passing request is inspected)
+              auth_request /ml_check; # proxies to ml:5000/predict (POST)
+
+              # GZip compression (text/plain, CSS, JSON, JS ≥ 256 bytes)
+              gzip on; gzip_min_length 256;</div>
+          </div>
+
+          <!-- Key Features -->
+          <div class="card">
+            <div class="about-section-title">✨ Key Features</div>
+            <ul class="feature-list">
+              <li><span class="fi">🧠</span> <strong>Layered ML defence</strong> — Three independent scikit-learn
+                classifiers (Global, XSS, SQLi) with tunable probability thresholds run in sequence on every request.
+              </li>
+              <li><span class="fi">📜</span> <strong>Regex blacklist pre-filter</strong> — 12 battle-tested SQL
+                injection patterns are checked first, ensuring zero-latency blocking of the most common attacks.</li>
+              <li><span class="fi">🤖</span> <strong>NGINX bot fingerprinting</strong> — Seven scanner/tool User-Agent
+                signatures are matched at the edge before any Python code runs.</li>
+              <li><span class="fi">⏱</span> <strong>Per-IP rate limiting</strong> — Configurable request rate (default 2
+                req/s, burst 3) with HTTP 429 responses to mitigate brute-force and DDoS.</li>
+              <li><span class="fi">🗂</span> <strong>Proxy caching</strong> — 60-second response cache reduces origin
+                load and provides stale-while-revalidate resilience during ML service restarts.</li>
+              <li><span class="fi">📊</span> <strong>Real-time analytics dashboard</strong> — Live charts, threat
+                categorisation, top-IP tracking and live log streaming with 5-second auto-refresh.</li>
+              <li><span class="fi">🚫</span> <strong>Dynamic IP blacklist</strong> — Block/unblock IPs with one click
+                via the REST API — changes are persisted to <code
+                  style="color:var(--accent);font-size:12px;">blacklist.json</code>.</li>
+              <li><span class="fi">📂</span> <strong>Forensic log export</strong> — Download filtered security logs as
+                CSV or formatted PDF reports (powered by ReportLab) for compliance and auditing.</li>
+              <li><span class="fi">🔐</span> <strong>Hardened HTTP headers</strong> — Five security response headers
+                configured at the NGINX layer: CSP, X-Frame-Options, XSS-Protection, MIME sniff guard, Referrer-Policy.
+              </li>
+              <li><span class="fi">📦</span> <strong>Fully containerised</strong> — Three-service Docker Compose stack
+                (origin, edge, ml) with shared Docker volumes for logs and quarantine events.</li>
+            </ul>
+          </div>
+
+          <!-- How to Run -->
+          <div class="card">
+            <div class="about-section-title">🚀 How to Run</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div>
+                <div class="form-label" style="margin-bottom:6px;">Option A — Docker Compose (full stack)</div>
+                <div class="code-block">docker compose up --build</div>
+                <p class="hint" style="margin-top:6px;">Edge WAF runs on <strong
+                    style="color:var(--accent)">http://localhost:8080</strong> · ML engine on port 5000</p>
+              </div>
+              <div>
+                <div class="form-label" style="margin-bottom:6px;">Option B — Local development (dashboard only)</div>
+                <div class="code-block">source .venv/bin/activate
+                  uvicorn main:app --reload # Dashboard → http://localhost:8000
+
+                  # In a separate terminal:
+                  cd ml &amp;&amp; uvicorn app:app --reload --port 5000 # ML engine</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /panel-about -->
+
+      </div><!-- /.page-content -->
+    </div><!-- /.main -->
+  </div><!-- /.app-shell -->
+
+
+  <!-- =====================================================
+     SCRIPTS
+====================================================== -->
+  <script>
+
+    /* ---- Navigation ---- */
+
+    const pagesMeta = {
+      dashboard: { title: 'Dashboard', subtitle: 'Real-time security overview' },
+      logs: { title: 'Live Logs', subtitle: 'All inspected traffic events' },
+      threats: { title: 'Threat Analysis', subtitle: 'Attack category breakdown' },
+      blacklist: { title: 'IP Blacklist', subtitle: 'Manage blocked IP addresses' },
+      export: { title: 'Log Export', subtitle: 'Download filtered security reports' },
+      ml: { title: 'ML Engine', subtitle: 'Active models & inference tester' },
+      phishing: { title: 'Phishing Detector', subtitle: 'ML-powered URL phishing classification' },
+      about: { title: 'About', subtitle: 'Platform information & architecture' },
+    };
+
+    function navigateTo(page) {
+      // Hide all panels
+      document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+      // Show target panel
+      const panel = document.getElementById('panel-' + page);
+      if (panel) panel.classList.add('active');
+
+      // Activate nav item
+      const navItem = document.getElementById('nav-' + page);
+      if (navItem) navItem.classList.add('active');
+
+      // Update topbar
+      const meta = pagesMeta[page] || {};
+      document.getElementById('topbar-title').textContent = meta.title || page;
+      document.getElementById('topbar-subtitle').textContent = meta.subtitle || '';
+    }
+
+    /* ---- Clock ---- */
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('topbar-time').textContent =
+        '🕐 ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* ---- Charts (kept between refreshes) ---- */
+    let pieChart = null, barChart = null, threatBarChart = null;
+
+    /* ---- Main data loader ---- */
+    async function load() {
+      const [sumRes, logRes] = await Promise.all([
+        fetch('/api/summary'),
+        fetch('/api/logs'),
+      ]);
+      const d = await sumRes.json();
+      const logs = await logRes.json();
+
+      /* -- Stat tiles -- */
+      const total = (d.status['200'] || 0) + (d.status['403'] || 0) + (d.status['429'] || 0);
+      document.getElementById('score').textContent = d.score + '% Safe';
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-blocked').textContent = d.status['403'] || 0;
+      document.getElementById('stat-allowed').textContent = d.status['200'] || 0;
+
+      /* -- Populate export filter dropdown -- */
+      const sel = document.getElementById('type');
+      sel.innerHTML = '<option value="ALL">ALL</option>';
+      Object.keys(d.types).forEach(atk => {
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = atk;
+        sel.appendChild(opt);
+      });
+
+      /* -- Pie chart -- */
+      const pieLabels = Object.keys(d.types);
+      const pieData = Object.values(d.types);
+      const pieColors = [
+        
+        'rgba(34,197,94,.75)', // green
+        'rgba(239,68,68,.75)', // red
+        'rgba(245,158,11,.75)', // yellow
+        'rgba(59,130,246,.75)', // blue
+        'rgba(168,85,247,.75)', // purple
+        'rgba(6,182,212,.75)', // cyan
+        'rgba(16,185,129,.75)', // emerald
+        'rgba(234,179,8,.75)', // amber
+        'rgba(255,255,255,0.75)', // rose
+        'rgba(79,70,229,.75)', // indigo
+      ];
+
+      if (pieChart) {
+        pieChart.data.labels = pieLabels;
+        pieChart.data.datasets[0].data = pieData;
+        pieChart.update();
+      } else {
+        pieChart = new Chart(document.getElementById('pie'), {
+          type: 'doughnut',
+          data: {
+            labels: pieLabels,
+            datasets: [{ data: pieData, backgroundColor: pieColors, borderWidth: 2, borderColor: '#0c1322' }],
+          },
+          options: {
+            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } } },
+            cutout: '60%',
+          },
+        });
+      }
+
+      /* -- Bar chart -- */
+      const barData = [d.status['200'] || 0, d.status['403'] || 0, d.status['429'] || 0];
+      if (barChart) {
+        barChart.data.datasets[0].data = barData;
+        barChart.update();
+      } else {
+        barChart = new Chart(document.getElementById('bar'), {
+          type: 'bar',
+          data: {
+            labels: ['Allowed (200)', 'Blocked (403)', 'Rate Limited (429)'],
+            datasets: [{
+              label: 'Requests',
+              backgroundColor: ['rgba(34,197,94,.75)', 'rgba(239,68,68,.75)', 'rgba(245,158,11,.75)'],
+              data: barData,
+              borderRadius: 6,
+            }],
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e2d45' } },
+              y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e2d45' } },
+            },
+          },
+        });
+      }
+
+      /* -- Top IPs -- */
+      let ipHtml = '<tr><th>IP Address</th><th>Event Count</th><th>Risk</th></tr>';
+      d.top_ips.forEach(i => {
+        const risk = i[1] >= 10 ? '<span class="badge badge-red">High</span>'
+          : i[1] >= 5 ? '<span class="badge badge-yellow">Medium</span>'
+            : '<span class="badge badge-green">Low</span>';
+        ipHtml += `<tr><td>${i[0]}</td><td>${i[1]}</td><td>${risk}</td></tr>`;
+      });
+      document.getElementById('ips').innerHTML = ipHtml;
+
+      /* -- Live Logs -- */
+      window._logs = logs;
+      renderLogs();
+
+      /* -- Threat analysis -- */
+      const xssCount = (d.types['XSS Attack'] || 0) + (d.types['Encoded XSS Attack'] || 0) + (d.types['Cross-Site Scripting (ML Detected)'] || 0);
+      const sqliCount = Object.entries(d.types).filter(([k]) => k.toLowerCase().includes('sql')).reduce((s, [, v]) => s + v, 0);
+      const botCount = d.types['Bot Detection'] || 0;
+
+      document.getElementById('threat-xss').textContent = xssCount;
+      document.getElementById('threat-sqli').textContent = sqliCount;
+      document.getElementById('threat-bot').textContent = botCount;
+
+      // Threat table
+      let tHtml = '<tr><th>Attack Type</th><th>Count</th><th>Severity</th></tr>';
+      Object.entries(d.types).sort((a, b) => b[1] - a[1]).forEach(([type, count]) => {
+        const sev = type.toLowerCase().includes('sql') ? '<span class="badge badge-red">Critical</span>'
+          : type.toLowerCase().includes('xss') ? '<span class="badge badge-yellow">High</span>'
+            : type.toLowerCase().includes('bot') ? '<span class="badge badge-purple">Medium</span>'
+              : type === 'Normal Traffic' ? '<span class="badge badge-green">None</span>'
+                : '<span class="badge badge-blue">Medium</span>';
+        tHtml += `<tr><td>${type}</td><td>${count}</td><td>${sev}</td></tr>`;
+      });
+      document.getElementById('threat-table').innerHTML = tHtml;
+
+      // Threat bar chart
+      const tLabels = Object.keys(d.types);
+      const tData = Object.values(d.types);
+      if (threatBarChart) {
+        threatBarChart.data.labels = tLabels;
+        threatBarChart.data.datasets[0].data = tData;
+        threatBarChart.update();
+      } else {
+        threatBarChart = new Chart(document.getElementById('threat-bar'), {
+          type: 'bar',
+          data: {
+            labels: tLabels,
+            datasets: [{
+              label: 'Events',
+              backgroundColor: 'rgba(239,68,68,.7)',
+              data: tData,
+              borderRadius: 5,
+            }],
+          },
+          options: {
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e2d45' } },
+              y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e2d45' } },
+            },
+          },
+        });
+      }
+    }
+
+    /* ---- Logs renderer ---- */
+    function renderLogs(filter = '') {
+      const logs = window._logs || [];
+      const f = filter.toLowerCase();
+      let h = '<tr><th>IP Address</th><th>Attack Type</th><th>Status</th><th>Time</th><th>Action</th></tr>';
+      logs
+        .filter(x => !f || (x.ip && x.ip.includes(f)) || (x.attack && x.attack.toLowerCase().includes(f)))
+        .forEach(x => {
+          const statusBadge = x.status === 200
+            ? `<span class="badge badge-green">${x.status}</span>`
+            : `<span class="badge badge-red">${x.status}</span>`;
+          const time = x.time ? x.time.substring(0, 19).replace('T', ' ') : '—';
+          const btn = `<button class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="block('${x.ip}')">Block</button>`;
+          h += `<tr>
+          <td>${x.ip || '—'}</td>
+          <td>${x.attack}</td>
+          <td>${statusBadge}</td>
+          <td style="color:var(--text-muted);font-size:12px;">${time}</td>
+          <td>${btn}</td>
+        </tr>`;
+        });
+      document.getElementById('logs').innerHTML = h;
+    }
+
+    document.getElementById('search').addEventListener('keyup', e => renderLogs(e.target.value));
+
+    /* ---- Blacklist ---- */
+    async function loadBlacklist() {
+      const r = await fetch('/api/blacklist');
+      const data = await r.json();
+      let h = '<tr><th>Blocked IP</th><th>Status</th><th>Action</th></tr>';
+      if (data.length === 0) {
+        h += '<tr><td colspan="3" style="color:var(--text-muted);text-align:center;padding:20px;">No IPs currently blacklisted</td></tr>';
+      }
+      data.forEach(ip => {
+        h += `<tr>
+        <td>${ip}</td>
+        <td><span class="badge badge-red">Blocked</span></td>
+        <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="unblock('${ip}')">Unblock</button></td>
+      </tr>`;
+      });
+      document.getElementById('blacklist').innerHTML = h;
+    }
+
+    function block(ip) {
+      fetch('/api/block', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip }),
+      }).then(loadBlacklist);
+    }
+
+    function unblock(ip) {
+      fetch('/api/unblock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip }),
+      }).then(loadBlacklist);
+    }
+
+    /* ---- Export ---- */
+    function downloadCSV() {
+      window.location = '/export/csv?type=' + document.getElementById('type').value;
+    }
+    function downloadPDF() {
+      window.location = '/export/pdf?type=' + document.getElementById('type').value;
+    }
+
+    /* ---- Clear All Logs ---- */
+    async function clearAllLogs() {
+      const msg = document.getElementById('clear-logs-msg');
+      const btn = document.getElementById('clear-logs-btn');
+      if (!confirm('This will permanently delete ALL log entries (ML quarantine + NGINX access log).\nBot detection count and all other counters will reset to zero.\n\nAre you sure?')) return;
+      btn.disabled = true;
+      btn.textContent = '⏳ Clearing…';
+      try {
+        const res = await fetch('/api/clear-logs', { method: 'POST' });
+        const data = await res.json();
+        msg.style.color = 'var(--success)';
+        msg.textContent = '✓ Logs cleared — all counters reset to 0';
+        // Refresh dashboard data immediately
+        load();
+      } catch (e) {
+        msg.style.color = 'var(--danger)';
+        msg.textContent = '✗ Error: ' + e.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🗑 Clear All Logs (Reset Counters)';
+      }
+    }
+
+    /* ---- ML Inference Tester ---- */
+    async function testPayload() {
+      const payload = document.getElementById('ml-payload').value.trim();
+      const result = document.getElementById('ml-result');
+      const btn = document.getElementById('ml-test-btn');
+      if (!payload) {
+        result.innerHTML = '<span style="color:var(--warning)">⚠ Please enter a payload to test.</span>';
+        return;
+      }
+      btn.textContent = '⏳ Running…';
+      btn.disabled = true;
+      try {
+        const res = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payload }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          result.innerHTML = `<span class="badge badge-green" style="font-size:13px;padding:6px 14px;">
+          ✅ Decision: ${data.decision?.toUpperCase() || 'ALLOW'}
+        </span>`;
+        } else {
+          const data = await res.json().catch(() => ({}));
+          result.innerHTML = `<span class="badge badge-red" style="font-size:13px;padding:6px 14px;">
+          🚫 BLOCKED — ${data.detail || 'Detected as threat'}
+        </span>`;
+        }
+      } catch (e) {
+        result.innerHTML = '<span style="color:var(--text-muted)">ML engine not reachable on this instance.</span>';
+      }
+      btn.textContent = '▶ Run Inference';
+      btn.disabled = false;
+    }
+
+    /* ---- Init & polling ---- */
+    load();
+    loadBlacklist();
+    setInterval(() => { load(); loadBlacklist(); }, 5000);
+
+    /* =========================================================
+       PHISHING DETECTOR
+    ========================================================= */
+
+    let _phishingHistory = [];  // [{url, label, confidence, risk_level}]
+
+    // Risk level -> badge class
+    function riskBadge(level) {
+      const map = { Critical: 'badge-red', High: 'badge-red', Medium: 'badge-yellow', Low: 'badge-green' };
+      return `<span class="badge ${map[level] || 'badge-blue'}">${level}</span>`;
+    }
+
+    function labelBadge(label) {
+      return label === 'Phishing'
+        ? `<span class="badge badge-red" style="font-size:13px;padding:6px 14px;">🚨 ${label}</span>`
+        : `<span class="badge badge-green" style="font-size:13px;padding:6px 14px;">✅ ${label}</span>`;
+    }
+
+    // Confidence ring progress bar
+    function confBar(pct, isPhishing) {
+      const color = isPhishing ? 'var(--danger)' : 'var(--success)';
+      return `
+        <div style="margin:14px 0 6px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:5px;">
+            <span>Confidence</span><span style="color:${color};font-weight:700;">${pct}%</span>
+          </div>
+          <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:${color};border-radius:3px;transition:width .6s ease;"></div>
+          </div>
+        </div>`;
+    }
+
+    // Render featured signals from features object
+    function renderFeatureBreakdown(feats) {
+      const interesting = [
+        ['url_length', 'URL Length', v => v > 75 ? '⚠' : '✓', v => `${v} chars`],
+        ['has_ip_hostname', 'IP-based hostname', v => v ? '⚠' : '✓', v => v ? 'Yes — suspicious' : 'No'],
+        ['has_at_symbol', '@ symbol trick', v => v ? '⚠' : '✓', v => v ? 'Detected' : 'Not found'],
+        ['risky_tld', 'Risky TLD', v => v ? '⚠' : '✓', v => v ? 'Yes (.tk/.ml/etc)' : 'No'],
+        ['subdomain_count', 'Subdomain depth', v => v > 2 ? '⚠' : '✓', v => `${v} subdomain(s)`],
+        ['suspicious_keyword_cnt', 'Phishing keywords', v => v > 0 ? '⚠' : '✓', v => `${v} found`],
+        ['percent_encoded_count', 'URL encoding (%xx)', v => v > 3 ? '⚠' : '✓', v => `${v} encoded chars`],
+        ['is_url_shortener', 'URL shortener', v => v ? '⚠' : '✓', v => v ? 'Detected' : 'No'],
+        ['has_https', 'HTTPS', v => v ? '✓' : '⚠', v => v ? 'Secure (HTTPS)' : 'Insecure (HTTP)'],
+        ['hyphen_count', 'Hyphens in domain', v => v > 2 ? '⚠' : '✓', v => `${v}`],
+        ['equals_count', 'Query = parameters', v => v > 4 ? '⚠' : '✓', v => `${v}`],
+        ['has_double_slash_path', 'Double-slash in path', v => v ? '⚠' : '✓', v => v ? 'Detected' : 'No'],
+      ];
+      let rows = '';
+      for (const [key, label, iconFn, valFn] of interesting) {
+        const val = feats[key] ?? 0;
+        const icon = iconFn(val);
+        const cls = icon === '⚠' ? 'color:var(--warning)' : 'color:var(--success)';
+        rows += `<tr>
+          <td style="${cls};font-size:14px;width:24px;">${icon}</td>
+          <td style="font-size:12.5px;">${label}</td>
+          <td style="font-size:12px;color:var(--text-muted);">${valFn(val)}</td>
+        </tr>`;
+      }
+      return `<table style="margin-top:4px;">${rows}</table>`;
+    }
+
+    function renderHistoryTable() {
+      const el = document.getElementById('phishing-history');
+      if (!el) return;
+      if (_phishingHistory.length === 0) {
+        el.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:20px;">No URLs scanned yet</td></tr>';
+        return;
+      }
+      let h = '<tr><th>URL</th><th>Label</th><th>Risk</th><th>Confidence</th></tr>';
+      [..._phishingHistory].reverse().forEach(r => {
+        const urlShort = r.url.length > 60 ? r.url.slice(0, 57) + '...' : r.url;
+        h += `<tr>
+          <td style="font-size:11.5px;font-family:monospace;color:var(--accent);max-width:320px;word-break:break-all;">${urlShort}</td>
+          <td>${r.label === 'Phishing'
+            ? '<span class="badge badge-red">Phishing</span>'
+            : '<span class="badge badge-green">Legitimate</span>'}</td>
+          <td>${riskBadge(r.risk_level)}</td>
+          <td style="font-weight:700;color:${r.label === 'Phishing' ? 'var(--danger)' : 'var(--success)'}">${r.confidence}%</td>
+        </tr>`;
+      });
+      el.innerHTML = h;
+    }
+
+    function clearHistory() {
+      _phishingHistory = [];
+      renderHistoryTable();
+    }
+
+    async function checkPhishing() {
+      const url = document.getElementById('phishing-url-input').value.trim();
+      const resultEl = document.getElementById('phishing-result');
+      const btn = document.getElementById('phishing-check-btn');
+      if (!url) {
+        resultEl.innerHTML = '<span style="color:var(--warning)">⚠ Please enter a URL.</span>';
+        return;
+      }
+      btn.textContent = '⏳ Analysing…';
+      btn.disabled = true;
+      resultEl.innerHTML = '<span style="color:var(--text-muted)">Running inference…</span>';
+      try {
+        const res = await fetch('/api/phishing/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        const isPhish = data.label === 'Phishing';
+        resultEl.innerHTML = `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:18px;">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;">Verdict</div>
+              ${labelBadge(data.label)}
+              ${confBar(data.confidence, isPhish)}
+              <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+                <div style="font-size:11px;color:var(--text-muted);">Risk Level</div>
+                ${riskBadge(data.risk_level)}
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">Decision threshold: ${data.threshold}%</div>
+            </div>
+            <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:18px;overflow:auto;">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;">Feature Signals</div>
+              ${renderFeatureBreakdown(data.features)}
+            </div>
+          </div>
+          <div style="margin-top:12px;font-size:11.5px;color:var(--text-muted);font-family:monospace;background:var(--bg-input);border:1px solid var(--border);border-radius:7px;padding:10px 14px;word-break:break-all;">URL: ${data.url}</div>
+        `;
+
+        // Add to history
+        _phishingHistory.push({ url: data.url, label: data.label, confidence: data.confidence, risk_level: data.risk_level });
+        renderHistoryTable();
+      } catch (e) {
+        resultEl.innerHTML = `<span style="color:var(--danger)">🚨 Error: ${e.message}</span>`;
+      }
+      btn.textContent = '▶ Analyse';
+      btn.disabled = false;
+    }
+
+    async function batchPhishing() {
+      const raw = document.getElementById('phishing-batch-input').value.trim();
+      const el = document.getElementById('phishing-batch-result');
+      const btn = document.getElementById('phishing-batch-btn');
+      const urls = raw.split('\n').map(u => u.trim()).filter(Boolean);
+      if (urls.length === 0) {
+        el.innerHTML = '<span style="color:var(--warning)">⚠ Please enter at least one URL.</span>';
+        return;
+      }
+      btn.textContent = `⏳ Scanning ${urls.length} URL(s)…`;
+      btn.disabled = true;
+      el.innerHTML = '<span style="color:var(--text-muted)">Running batch inference…</span>';
+      try {
+        const res = await fetch('/api/phishing/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urls }),
+        });
+        const data = await res.json();
+        const results = data.results || [];
+
+        let h = '<tr><th>URL</th><th>Label</th><th>Risk</th><th>Confidence</th></tr>';
+        results.forEach(r => {
+          if (r.error) {
+            h += `<tr><td colspan="4" style="color:var(--danger)">${r.url}: ${r.error}</td></tr>`;
+            return;
+          }
+          const urlShort = r.url.length > 55 ? r.url.slice(0, 52) + '...' : r.url;
+          const isPhish = r.label === 'Phishing';
+          h += `<tr>
+            <td style="font-size:11.5px;font-family:monospace;color:var(--accent);max-width:300px;word-break:break-all;">${urlShort}</td>
+            <td>${isPhish
+              ? '<span class="badge badge-red">Phishing</span>'
+              : '<span class="badge badge-green">Legitimate</span>'}</td>
+            <td>${riskBadge(r.risk_level)}</td>
+            <td style="font-weight:700;color:${isPhish ? 'var(--danger)' : 'var(--success)'}">${r.confidence}%</td>
+          </tr>`;
+          _phishingHistory.push({ url: r.url, label: r.label, confidence: r.confidence, risk_level: r.risk_level });
+        });
+        el.innerHTML = `<table>${h}</table>`;
+        renderHistoryTable();
+      } catch (e) {
+        el.innerHTML = `<span style="color:var(--danger)">🚨 Error: ${e.message}</span>`;
+      }
+      btn.textContent = '▶ Scan All';
+      btn.disabled = false;
+    }
+
+    // Init history table
+    renderHistoryTable();
+
+  </script>
+</body>
+
+</html>

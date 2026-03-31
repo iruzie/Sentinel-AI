@@ -1,0 +1,14 @@
+2026/02/18 04:01:07 [emerg] 1#1: "proxy_pass" cannot have URI part in location given by regular expression, or inside named location, or inside "if" statement, or inside "limit_except" block in /etc/nginx/nginx.conf:56
+2026/02/18 04:14:14 [emerg] 1#1: unknown directive "✅" in /etc/nginx/nginx.conf:54
+2026/02/18 04:49:42 [emerg] 1#1: unknown directive "✅" in /etc/nginx/nginx.conf:54
+2026/02/18 04:50:43 [emerg] 1#1: unknown directive "✅" in /etc/nginx/nginx.conf:54
+2026/02/18 04:58:15 [emerg] 1#1: unknown directive "✅" in /etc/nginx/nginx.conf:54
+2026/02/18 05:00:33 [emerg] 1#1: unknown directive "✅" in /etc/nginx/nginx.conf:54
+2026/02/19 07:20:15 [error] 28#28: *1 auth request unexpected status: 500 while sending to client, client: 192.168.65.1, server: , request: "GET /?q=hello HTTP/1.1", host: "127.0.0.1:8080"
+2026/02/19 07:20:17 [error] 27#27: *3 auth request unexpected status: 500 while sending to client, client: 192.168.65.1, server: , request: "GET /?q=<script>alert(1)</script> HTTP/1.1", host: "127.0.0.1:8080"
+2026/02/19 07:20:19 [error] 26#26: *5 auth request unexpected status: 500 while sending to client, client: 192.168.65.1, server: , request: "GET /?q=%3Cscript%3Ealert(1)%3C/script%3E HTTP/1.1", host: "127.0.0.1:8080"
+2026/02/19 07:20:21 [error] 23#23: *7 auth request unexpected status: 500 while sending to client, client: 192.168.65.1, server: , request: "GET /?id=1%27%20OR%201=1%20-- HTTP/1.1", host: "127.0.0.1:8080"
+2026/02/19 07:20:23 [error] 22#22: *9 auth request unexpected status: 500 while sending to client, client: 192.168.65.1, server: , request: "GET /?q=UNION%20SELECT%20NULL,NULL HTTP/1.1", host: "127.0.0.1:8080"
+2026/02/19 07:20:25 [error] 24#24: *11 auth request unexpected status: 500 while sending to client, client: 192.168.65.1, server: , request: "GET /?user=admin%27%20--%20 HTTP/1.1", host: "127.0.0.1:8080"
+2026/02/19 07:20:27 [error] 29#29: *13 auth request unexpected status: 500 while sending to client, client: 192.168.65.1, server: , request: "GET /?q=../../../../etc/passwd HTTP/1.1", host: "127.0.0.1:8080"
+2026/02/19 07:20:29 [error] 25#25: *15 auth request unexpected status: 500 while sending to client, client: 192.168.65.1, server: , request: "GET /?q=%00%ff%aa%bb%cc HTTP/1.1", host: "127.0.0.1:8080"

@@ -1,0 +1,10 @@
+# Sentinel-AI — Root API / Dashboard dependencies
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+reportlab
+
+# ML engine dependencies
+scikit-learn
+joblib

