@@ -1,0 +1,359 @@
+
+This project is a lightweight AI-powered Web Application Firewall (WAF) integrated into a Flask-based e-commerce shopping cart application. The system is designed to protect web applications from common application-layer attacks such as:
+
+* SQL Injection (SQLi)
+* Cross-Site Scripting (XSS)
+* Brute-force login attacks
+* Suspicious bot traffic
+
+Unlike traditional rule-based security systems, this project combines:
+
+* Machine Learning-based threat detection
+* Layered middleware security
+* Adaptive learning concepts
+* Real-time request interception
+* Quarantine-based batch retraining support
+
+The goal of the project is to provide a low-cost, self-hosted alternative to enterprise WAF solutions for small and medium businesses.
+
+---
+
+# Features
+
+## Phase 1 - AI-Based Threat Detection
+
+### XSS Detection
+
+* Random Forest-based XSS detection model
+* Detects malicious JavaScript payloads in product reviews and user-generated content
+* Integrated into Flask route-level validation
+* Achieved ~98% detection accuracy
+
+### SQL Injection Detection
+
+* Logistic Regression-based SQLi detector
+* Lightweight and optimized for real-time request validation
+* Detects malicious SQL patterns before database interaction
+
+---
+
+## Phase 2 - Layered Security Middleware
+
+Implemented using Flask `before_request` middleware.
+
+### Security Layers
+
+#### 1. Global WAF Layer
+
+* Filters suspicious payloads globally
+* Skips safe/static routes
+* Acts as the first security checkpoint
+
+#### 2. SQLi WAF Layer
+
+* Detects SQL injection attempts
+* Blocks malicious query parameters and form inputs
+
+#### 3. Brute-force Protection
+
+* Monitors repeated login failures
+* Prevents credential-stuffing attacks
+* Rate-based request blocking
+
+---
+
+# Adaptive Learning Architecture
+
+## Quarantine Dataset Concept
+
+Instead of retraining directly on live traffic, suspicious requests are stored in an isolated quarantine dataset.
+
+### Purpose
+
+* Capture potential false negatives
+* Detect emerging attack patterns
+* Prevent model poisoning
+* Support safe batch retraining
+
+### Workflow
+
+1. Incoming request is analyzed
+2. Model generates confidence/risk score
+3. Requests near decision boundary are quarantined
+4. Samples are validated manually or semi-automatically
+5. Verified samples are added to training dataset
+6. Models are retrained periodically in batches
+
+This design is inspired by:
+
+* Active Learning
+* Human-in-the-loop ML systems
+* Modern WAF and IDS architectures
+
+---
+
+# Why Batch Learning Instead of Online Learning?
+
+Online learning in security systems introduces several risks:
+
+* Model poisoning attacks
+* Incorrect real-time labeling
+* Unstable model drift
+* Increased false positives
+
+To avoid these issues, this project uses:
+
+* Quarantine-based validation
+* Controlled batch retraining
+* Offline evaluation before deployment
+
+This ensures model stability, safety, and auditability.
+
+---
+
+# Tech Stack
+
+## Backend
+
+* Flask
+* Flask-Login
+* SQLAlchemy
+
+## Database
+
+* MySQL
+
+## Machine Learning
+
+* Scikit-learn
+* Random Forest
+* Logistic Regression
+* joblib
+
+## Security
+
+* Custom Flask Middleware
+* AI-based Request Validation
+* Brute-force Detection
+* Layered WAF Architecture
+
+---
+
+# System Architecture
+
+```text
+User Request
+      |
+      v
++-------------------+
+| Global WAF Layer  |
++-------------------+
+      |
+      v
++-------------------+
+| SQLi Detection    |
++-------------------+
+      |
+      v
++-------------------+
+| Brute-force Layer |
++-------------------+
+      |
+      v
++-------------------+
+| Flask Application |
++-------------------+
+      |
+      v
+Database / Response
+```
+
+---
+
+# Why Different ML Models?
+
+## Logistic Regression for SQLi
+
+Chosen because:
+
+* SQLi payloads are largely keyword-based
+* Works well with sparse TF-IDF text features
+* Low inference latency
+* Interpretable and lightweight
+
+## Random Forest for XSS
+
+Chosen because:
+
+* XSS payloads are highly non-linear
+* Better handling of obfuscated scripts
+* Captures complex feature interactions
+* More robust against noisy inputs
+
+---
+
+# Project Importance
+
+Many small companies and non-tech organizations cannot afford enterprise-grade security solutions like Cloudflare or Akamai.
+
+This project aims to provide:
+
+* Affordable security
+* Self-hosted deployment
+* Easy integration into existing Flask apps
+* Real-time attack prevention
+* AI-assisted threat detection
+
+Suitable for:
+
+* E-commerce websites
+* Admin dashboards
+* Institutional portals
+* Startup web applications
+* Internal enterprise tools
+
+---
+
+# Future Scope
+
+## AI-Powered Security CDN
+
+Planned future extension:
+
+* Convert the WAF into a lightweight CDN-based reverse proxy
+* Centralized traffic inspection
+* Edge-level attack detection
+* Multi-client protection
+
+### Proposed Flow
+
+```text
+User -> Security CDN -> AI Detection Engine -> Client Website
+```
+
+---
+
+## Analytics Dashboard
+
+Planned analytics features:
+
+* Real-time attack monitoring
+* SQLi/XSS statistics
+* Top blocked IPs
+* Bot traffic analysis
+* Login attack heatmaps
+* Model confidence visualization
+* Quarantine sample review panel
+
+---
+
+# Results
+
+* Functional secure e-commerce application built
+* ~98% XSS detection accuracy achieved
+* Real-time request interception implemented
+* Multi-layer middleware security successfully integrated
+* Adaptive learning architecture designed
+
+---
+
+# Installation
+
+## Clone Repository
+
+```bash
+git clone <repository-url>
+cd <project-folder>
+```
+
+## Create Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+## Activate Environment
+
+### Windows
+
+```bash
+venv\Scripts\activate
+```
+
+### Linux/Mac
+
+```bash
+source venv/bin/activate
+```
+
+## Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Configure Database
+
+Update the database URI in `app.py`
+
+```python
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://username:password@localhost/database_name'
+```
+
+## Run Application
+
+```bash
+python app.py
+```
+
+---
+
+# Project Structure
+
+```text
+project/
+│
+├── app.py
+├── models/
+├── routes/
+├── security/
+│   ├── bruteforce.py
+│   ├── global_waf.py
+│   ├── sqli_waf.py
+│
+├── templates/
+├── static/
+├── data/
+├── extensions.py
+└── requirements.txt
+```
+
+---
+
+# Key Learning Outcomes
+
+* Building AI-integrated security systems
+* Flask middleware architecture
+* Real-time request interception
+* Machine learning deployment using joblib
+* Secure web application design
+* Adaptive learning concepts in cybersecurity
+* Defense-in-depth security architecture
+
+---
+
+# Disclaimer
+
+This project is intended for educational and research purposes.
+It is not a replacement for enterprise-grade CDN/WAF infrastructure and does not protect against large-scale network-level attacks such as DDoS.
+
+---
+
+# Contributors
+
+* Project Team Members
+* AI & Security Research Enthusiasts 😌
+
+Humanity really did decide to expose every web form on Earth to the internet and then act surprised when attackers showed up. So here we are building middleware shields at 2 AM like digital plumbers fixing leaking pipes.
+
+Vedio poc link:https://drive.google.com/file/d/14i39cIf72RB8ATDY1uSetk_QzwlN-Xj3/view?usp=drive_link
